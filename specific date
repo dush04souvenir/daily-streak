@@ -1,0 +1,19 @@
+const jsonfile = require('jsonfile');
+const moment = require('moment');
+const simpleGit = require('simple-git');
+
+const FILE_PATH = './data.json';
+const git = simpleGit();
+
+(async () => {
+  const DATE = moment.utc('2025-07-10').format(); // missed date in UTC
+  const data = { date: DATE };
+
+  await jsonfile.writeFile(FILE_PATH, data); // write to data.json
+  await git.env({ GIT_COMMITTER_DATE: DATE })
+           .add([FILE_PATH])
+           .commit(DATE, { '--date': DATE });
+  await git.push();
+
+  console.log(`✅ Restored commit for ${DATE}`);
+})();
